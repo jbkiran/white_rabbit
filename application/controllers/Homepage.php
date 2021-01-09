@@ -67,22 +67,27 @@ class Homepage extends CI_Controller {
 
 	public function upload_file()
 	{
-		if(isset($_FILES['lecture_image']) && $_FILES['lecture_image']['error'] !== 4)
+		if(isset($_FILES['file']) && $_FILES['file']['error'] !== 4)
         { 
            
-            $allowed =  array('gif','png' ,'jpg', 'jpeg');
-            $filename = $_FILES['lecture_image']['name'];
-            $ext = pathinfo($filename, PATHINFO_EXTENSION);
-            if(in_array($ext,$allowed))
+            $allowed_types 	=  array('txt','doc','docx','pdf','png','jpeg','jpg','gif');
+            $filename 		= $_FILES['file']['name'];
+            $file_extension	= pathinfo($filename, PATHINFO_EXTENSION);
+            if(in_array($file_extension,$allowed_types))
             {
+				if(!file_exists($directory_to_fetch)){
+					mkdir($directory_to_fetch, 0777, true);
+				}
+				$this->load->library('upload');
 
-                $lecture_id                         = $this->input->post('lecture_id', true);
+				$config                     = array();
+				$config['upload_path']      =  $directory_to_fetch;
+				$config['allowed_types']    = 'txt|doc|docx|pdf|png|jpeg|jpg|gif';
+				$config['file_name']        = $filename;
 
-                $version                            = rand(0,300);
-                if($this->upload_course_lecture_image_to_localserver(array('course_id'=>$this->input->post('course_id', true), 'lecture_id'=>$lecture_id )))
-                {
-                    $save['cl_lecture_image']               =  $lecture_id.".webp?v=".$version;
-                }
+				$this->upload->initialize($config);
+				$this->upload->do_upload('file');
+				$uploaded_data = $this->upload->data();
             }
             
         }
