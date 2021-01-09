@@ -35,6 +35,7 @@ class Homepage extends CI_Controller {
 		$response					= array();
 		if(!empty($mapped_listing))
 		{
+			//slicing the array for pagination
 			$paginated_data 		= array_slice($mapped_listing,$offset,$limit);
 			$response['data']		= $paginated_data;
 			$response['directory']	= $directory_to_fetch;
@@ -60,10 +61,14 @@ class Homepage extends CI_Controller {
 		}
         
 	}
+	/*
+	used for 	- removing file from the directory
+	date 		- 09-01-2021
+	*/
 	public function remove_file()
 	{
-		$filename 	= $this->input->post('file_name');
-		$file 		= $directory_to_fetch.$filename;
+		$filename 				= $this->input->post('file_name');
+		$file 					= $directory_to_fetch.$filename;
 		if(is_file($file))
 		{
 			unlink($file);
@@ -74,11 +79,16 @@ class Homepage extends CI_Controller {
         echo json_encode($response);
 	}
 
+	/*
+	used for 	- uploading file to the directory
+	date 		- 09-01-2021
+	*/
 	public function upload_file()
 	{
 		$response 				= array();
 		$response['status'] 	= false;
 		$response['message'] 	= 'error in uploading';
+		//checking if file is uploaded 
 		if(isset($_FILES['file']) && $_FILES['file']['error'] !== 4)
         { 
            
@@ -87,6 +97,7 @@ class Homepage extends CI_Controller {
             $file_extension		= pathinfo($filename, PATHINFO_EXTENSION);
             if(in_array($file_extension,$allowed_types))
             {
+
 				if(!file_exists($directory_to_fetch)){
 					mkdir($directory_to_fetch, 0777, true);
 				}
