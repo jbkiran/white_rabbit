@@ -19,6 +19,8 @@ class Homepage extends CI_Controller {
     {
 		$this->load->helper('directory');
 
+		$is_json	= $this->input->post('is_json',true);
+
 		//reference directory 
 		$directory_to_fetch			= './uploads/';
 
@@ -30,6 +32,7 @@ class Homepage extends CI_Controller {
 		{
 			$paginated_data 		= array_slice($mapped_listing,$start_point,$limit);
 			$response['data']		= $paginated_data;
+			$response['directory']	= $directory_to_fetch;
 			$response['status'] 	= true;
 			$response['message'] 	= 'files fetched from directory';
 		}
@@ -39,6 +42,14 @@ class Homepage extends CI_Controller {
 			$response['status'] 	= false;
 			$response['message'] 	= 'There is no files in the directory';
 		}
-        $this->load->view('welcome_message');
+		if($is_json == true)
+		{
+			json_encode($response);
+		}
+		else
+		{
+			$this->load->view('welcome_message',$response);
+		}
+        
     }
 }
