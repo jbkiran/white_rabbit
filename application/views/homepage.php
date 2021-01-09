@@ -110,7 +110,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             });
 		});
 
-		$(document).on('click','#success_upload',function(){
+		$(document).on('click','#success_upload',function(e){
 
 			e.preventDefault();    
 			var formData = new FormData(this);

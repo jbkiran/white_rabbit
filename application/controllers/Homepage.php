@@ -67,12 +67,15 @@ class Homepage extends CI_Controller {
 
 	public function upload_file()
 	{
+		$response 				= array();
+		$response['status'] 	= false;
+		$response['message'] 	= 'error in uploading';
 		if(isset($_FILES['file']) && $_FILES['file']['error'] !== 4)
         { 
            
-            $allowed_types 	=  array('txt','doc','docx','pdf','png','jpeg','jpg','gif');
-            $filename 		= $_FILES['file']['name'];
-            $file_extension	= pathinfo($filename, PATHINFO_EXTENSION);
+            $allowed_types 		=  array('txt','doc','docx','pdf','png','jpeg','jpg','gif');
+            $filename 			= $_FILES['file']['name'];
+            $file_extension		= pathinfo($filename, PATHINFO_EXTENSION);
             if(in_array($file_extension,$allowed_types))
             {
 				if(!file_exists($directory_to_fetch)){
@@ -84,12 +87,21 @@ class Homepage extends CI_Controller {
 				$config['upload_path']      =  $directory_to_fetch;
 				$config['allowed_types']    = 'txt|doc|docx|pdf|png|jpeg|jpg|gif';
 				$config['file_name']        = $filename;
+				$config['max_size'] 		= 2000;
 
 				$this->upload->initialize($config);
 				$this->upload->do_upload('file');
-				$uploaded_data = $this->upload->data();
+				$uploaded_data 				= $this->upload->data();
+				if(!empty($uploaded_data))
+				{
+					
+					$response['status'] 	= true;
+					$response['message'] 	= 'successfully uploaded';
+				}
+				
             }
             
-        }
+		}
+		echo json_encode($response);
 	}
 }
