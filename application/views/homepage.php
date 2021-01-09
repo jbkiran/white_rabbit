@@ -53,10 +53,14 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 	</body>
 
 	<script>
-	  var __filesList   = "<?php echo $data; ?>";
-	  var __status		= "<?php echo $status; ?>";	
-	  var __message		= "<?php echo $message; ?>";
-	  var __directory 	= "<?php echo $directory; ?>";
+		var __filesList   		= "<?php echo $data; ?>";
+		var __status			= "<?php echo $status; ?>";	
+		var __message			= "<?php echo $message; ?>";
+		var __directory 		= "<?php echo $directory; ?>";
+		var __offset			= "<?php echo $offset; ?>";
+		var __limit				= "<?php echo $limit; ?>";
+		var __totalRecords		= "<?php echo $total; ?>";
+
 		$(document).ready(function(){
 			
 			$('#directoryName').text(__directory);
@@ -68,6 +72,35 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 			}
 			
 		});
+		function nextPage(){
+
+			if (__offset > __totalRecords) {
+   				__offset = __totalRecords;
+			}
+			if (__offset < 1) {
+				__offset = 1;
+			} 
+
+			$pageOffset = (__offset - 1) * __limit;
+
+			$.ajax({
+                url: "<?php echo base_url('Homepage/list_directory'); ?>",
+                type: "post",
+                data: {
+                    offset		: pageOffset
+                },
+                success: function (result) {
+                    
+					var response = $.parseJSON(result);
+					if(response.status == true){
+						$('#listings').html(renderData(response.data));
+					}else{
+						$('#listings').html(response.message);
+					}
+                }
+            });
+		}
+
 		//render list
 		function renderData(fileList){
 

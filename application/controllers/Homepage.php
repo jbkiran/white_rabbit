@@ -7,7 +7,8 @@ class Homepage extends CI_Controller {
     {
 		parent::__construct();
 		//reference directory 
-		$directory_to_fetch			= './uploads/';
+		$directory_to_fetch		= './uploads/';
+		
     }
 	public function index()
 	{
@@ -20,8 +21,13 @@ class Homepage extends CI_Controller {
 	public function list_directory()
     {
 		$this->load->helper('directory');
-
-		$is_json	= $this->input->post('is_json',true);
+		$offset 		= 0;
+		$limit 			= 10;
+		$is_json		= $this->input->post('is_json',true);
+		if($is_json)
+		{
+			$offset = $this->input->post('offset');
+		}
 
 		//fetching all files from directory , param '1' is passed to control the recursion depth
 		$mapped_listing				= directory_map($directory_to_fetch,1);
@@ -29,9 +35,12 @@ class Homepage extends CI_Controller {
 		$response					= array();
 		if(!empty($mapped_listing))
 		{
-			$paginated_data 		= array_slice($mapped_listing,$start_point,$limit);
+			$paginated_data 		= array_slice($mapped_listing,$offset,$limit);
 			$response['data']		= $paginated_data;
 			$response['directory']	= $directory_to_fetch;
+			$response['offset']		= $offset;
+			$response['limit']		= $limit;
+			$response['total']		= count($mapped_listing);
 			$response['status'] 	= true;
 			$response['message'] 	= 'files fetched from directory';
 		}
