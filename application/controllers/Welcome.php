@@ -1,25 +1,44 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Welcome extends CI_Controller {
+class Homepage extends CI_Controller {
 
-	/**
-	 * Index Page for this controller.
-	 *
-	 * Maps to the following URL
-	 * 		http://example.com/index.php/welcome
-	 *	- or -
-	 * 		http://example.com/index.php/welcome/index
-	 *	- or -
-	 * Since this controller is set as the default controller in
-	 * config/routes.php, it's displayed at http://example.com/
-	 *
-	 * So any other public methods not prefixed with an underscore will
-	 * map to /index.php/welcome/<method_name>
-	 * @see https://codeigniter.com/user_guide/general/urls.html
-	 */
+	public function __construct()
+    {
+        parent::__construct();
+    }
 	public function index()
 	{
-		$this->load->view('welcome_message');
+		$this->list_directory();
 	}
+	/*
+	used for 	- listing all files from a specific directory
+	date 		- 09-01-2021
+	*/
+	public function list_directory()
+    {
+		$this->load->helper('directory');
+
+		//reference directory 
+		$directory_to_fetch			= './uploads/';
+
+		//fetching all files from directory , param '1' is passed to control the recursion depth
+		$mapped_listing				= directory_map($directory_to_fetch,1);
+
+		$response					= array();
+		if(!empty($mapped_listing))
+		{
+			$paginated_data 		= array_slice($mapped_listing,$start_point,$limit);
+			$response['data']		= $paginated_data;
+			$response['status'] 	= true;
+			$response['message'] 	= 'files fetched from directory';
+		}
+		else
+		{
+			$response['data']		= array();
+			$response['status'] 	= false;
+			$response['message'] 	= 'There is no files in the directory';
+		}
+        $this->load->view('welcome_message');
+    }
 }
